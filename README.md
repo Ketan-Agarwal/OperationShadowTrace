@@ -145,7 +145,7 @@ After substituting 0 with A, 1 with B and so on, and last's `bcbc` with `1212`, 
 
 ### Step 14: Exploring Instagram
 Found reference to [a wikipedia article's version history](https://en.wikipedia.org/w/index.php?title=Thomas_Keller_Medal&action=history) in one of Instagram Highlights posted on 29th September 2024.
-![alt text](image.png)
+![alt text](images/image-2.png)
 Found flag in version history.
 
 #### Flag 4: `PClub{idk_how_this_got_typed}`
