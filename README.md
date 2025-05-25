@@ -13,6 +13,7 @@ I began by exploring the site `infosec.pclub.in`. Checking common entry points, 
 
 The Reddit profile had some posts, 2 being latest and another 2 around 8 months old. One of the latest post had an image. Suspecting hidden data in the image, I analysed the image using tools like `steghide`, `binwalk`, `aperisolve` but found no hidden data. Even the posts didn't provide clear leads so I moved on to other avenues.
 - The reddit posts lead me to a dead end for the time being.
+![alt text](images/image-3.png)
 
 ### Step 3: Web Enumeration with `ffuf`
 I performed directory enumeration using [`ffuf`](https://github.com/ffuf/ffuf) to uncove hidden paths on `infosec.pclub.in`. Despite extensive scanning, no useful directories or files were found.
